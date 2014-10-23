@@ -15,7 +15,8 @@ Author URI: http://invinciblecreative.com/
 add_action('publish_post', 'send_admin_email');
 
 function send_admin_email($post_id){
-	$to = 'exygy@invinciblecreative.com';
+	$acf_email = get_field('email_address', 'option');
+	$to = $acf_email;
 	$subject = 'New Post at Exygy';
 	$hi = 'Extra! Extra! Read all about it: ';
 	$title = get_the_title( $post_id );
@@ -36,10 +37,19 @@ function send_admin_email($post_id){
 	
 	$compare_publish = strtotime($date_publish);
 	$compare_revise = strtotime($date_revise);
+	
 
+	$acf_email_body = get_field('email', 'option');
+
+	$shortcodes  = $acf_email_body;
+	$codes = array("[post_title]", "[post_author]", "[post_body]");
+	$shortcode_convert = array($title, $author, $email_content);
 	
-	$message = $hi . "\r\n" . $title . " - Written by " . $author . "\r\n\r\n" . $email_content;
+	$newcodes = str_replace($codes, $shortcode_convert, $shortcodes);
+	$email_newcodes = strip_tags($newcodes);
 	
+
+	$message = $email_newcodes;
 	
 	if ( $date_publish === $date_revise ) {
 			wp_mail($to,$subject,$message);
